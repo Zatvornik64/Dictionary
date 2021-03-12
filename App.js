@@ -1,21 +1,28 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react'
+import AppLoading from 'expo-app-loading'
+import { Provider } from 'react-redux'
+import { AppNavigation } from './src/navigation/AppNavigation'
+import { initLoading } from './src/initLoading'
+import { store } from './src/redux/store'
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+  const [isReady, setIsReady] = useState(false)
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+  // в SDK 39 Apploading вызывает ошибку "No native splash screen registered for provided activity"
+  // и пока будет работать напрямую 
+  if (!isReady) {
+    return (
+      <AppLoading
+        startAsync={initLoading}
+        onFinish={() => setIsReady(true)}
+        onError={err => console.log(err)}
+      />
+    )
+  }
+
+  return (
+    <Provider store={store}>
+      <AppNavigation />
+    </Provider>
+  )
+}

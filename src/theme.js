@@ -1,0 +1,7 @@
+export const THEME = {
+  HEADER_BACKGROUND: '#ddd',
+  MAIN_COLOR: '#303f9f',
+  DANGER_COLOR: '#d81b60',
+  SELECTED: '#1E90FF',
+  NOT_SELECTED: '#808080',
+}
