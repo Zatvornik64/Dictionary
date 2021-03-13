@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
 const validate = (text, items, id) => {
   let error = false;
   items.forEach(el => {
-    if (text === el.lang1 && id !== el.id) error = true;
+    if (text.toLowerCase() === el.lang1.toLowerCase() && id !== el.id) error = true;
   })
   return error;
 }

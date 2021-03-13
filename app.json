@@ -24,7 +24,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.mikeposhivalov.Dictionary"
+      "package": "com.github.Zatvornik64.Dictionary"
     },
     "web": {
       "favicon": "./assets/favicon.png"

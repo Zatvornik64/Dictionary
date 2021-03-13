@@ -6,7 +6,8 @@ const initialState = {
         lang1Caption: "Русский",
         lang2Caption: "Английский",
         lang3Caption: "Французский",
-    loading: true,
+        sorting: "lang1",
+        loading: true,
     }
 }
 

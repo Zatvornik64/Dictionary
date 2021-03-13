@@ -1,5 +1,5 @@
 import React, { useEffect, useState }  from 'react'
-import { View, ScrollView ,  StyleSheet, FlatList, ActivityIndicator, Image, Text, TouchableOpacity, Button } from 'react-native'
+import { View, KeyboardAvoidingView ,  StyleSheet, FlatList, ActivityIndicator, Image, Text, TouchableOpacity, Button, TextInput  } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { ItemBlock } from '../components/ItemBlock'
 import { MainHeaderIcons } from '../components/MainHeaderIcons'
@@ -12,8 +12,9 @@ import { THEME } from '../theme'
 export const MainScreen = ({ navigation }) => {
   const dispatch = useDispatch();
 
-  const onOpen = index => {
-    navigation.navigate('Editor', { item: items[index], items } ) 
+  const onOpen = id => {
+    //console.log(items.filter(el => el.id === id)[0])
+    navigation.navigate('Editor', { item: items.filter(el => el.id === id)[0], items } ) 
   }
 
   const settings = useSelector(state => state.dictionarySettings.settings);
@@ -22,14 +23,15 @@ export const MainScreen = ({ navigation }) => {
   const lang1Caption = settings.lang1Caption || "Русский";
   const lang2Caption = settings.lang2Caption || "Английский";
   const lang3Caption = settings.lang3Caption || "Французский";
-  const [sorting, setSorting] = useState(settings.sorting);
+  const [sorting, setSorting] = useState(settings.sorting || "lang1");
+  const [filterText, setFilterText] = useState("");
   //console.log("main_sorting: ", sorting)
   const newItem = {
     lang1: null,
     lang2: null,
     lang3: null,
   }
-  
+  //console.log("filter: ", filterText)
 
 
   const addNewItem = () => {
@@ -47,23 +49,21 @@ export const MainScreen = ({ navigation }) => {
   }, [dispatch])
 
   useEffect(()=>{
-    setSorting(settings.sorting)
+    if (settings.sorting) setSorting(settings.sorting)
   }, [settings])
   
   const items = useSelector(state => state.dictionaryData.items);
+  
   let renderList = [];
   items.forEach(el => {
     if (el[sorting] !== "") renderList.push({title:el[sorting], id: el.id})
   })
-  renderList.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0))
+  if (renderList[0]) {
+    renderList.sort((a,b) => (a.title.toLowerCase() > b.title.toLowerCase()) ? 1 : ((b.title.toLowerCase() > a.title.toLowerCase()) ? -1 : 0));
+    renderList = renderList.filter(el => el.title ? el.title.toLowerCase().includes(filterText.toLowerCase()) : false)
+  }
   //console.log("items: ", renderList)
   
-  /*if (items) {
-    items.forEach(item => {
-     if (typeof item.img === "string") item.img = JSON.parse(item.img)
-    });
-  }
-  items.sort((a,b) => b.id - a.id);*/
   const loading = useSelector(state => state.dictionaryData.loading);
 
   if (loading) {
@@ -75,10 +75,14 @@ export const MainScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.wrapper}>
+    <KeyboardAvoidingView 
+      style={styles.wrapper}
+      behavior='height'
+      keyboardVerticalOffset="-200"
+    >
       <View style={styles.items}>
         {items.length ?
-          <View>
+          <View style={styles.flex}>
             <Text style={styles.title}>Сортировка:</Text>
             <View style={styles.buttonsWrapper}>
               <View style={styles.buttons_left}>
@@ -102,17 +106,19 @@ export const MainScreen = ({ navigation }) => {
                   />}
               </View>
             </View>
-            <ScrollView>
-              {/*items.map(element => {
-                return (
-                  <>
-                    <ItemBlock item={element} onOpen={onOpen} items={items} />
-                  </>
-                )
-              })*/}
-            </ScrollView>
-            <View>
+            <View style={styles.finderBlock}>
+              <Text style={styles.finderTitle}>Поиск</Text>
+              <TextInput 
+                style={styles.finderText}
+                multiline={false}
+                onChangeText={text => setFilterText(text)} 
+                value={filterText} 
+                placeholder="Введите текст фильтра"
+              />
+                </View>
+            <View style={styles.flatlist}>
             <FlatList
+              scrollEnabled={true}
               data={renderList}
               keyExtractor={item => item.id.toString()}
               renderItem={ item  => <ItemBlock item={item} onOpen={onOpen} />} 
@@ -132,7 +138,7 @@ export const MainScreen = ({ navigation }) => {
           <Text style={styles.addText}>добавить</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   )
   }
 
@@ -150,13 +156,19 @@ const styles = StyleSheet.create({
     flex: 10,
     //backgroundColor: '#aaa'
   },
+  flex: {
+    flex: 1,
+  },
+  flatlist: {
+    flex: 15,
+  },
   add: {
     flex: 1,
   },
   title: {
     fontSize: 20,
     textAlign: 'center',
-    marginTop: '5%',
+    //marginTop: '5%',
   },
   addButton: {
     flex: 1,
@@ -183,4 +195,19 @@ const styles = StyleSheet.create({
     width: '45%',
     justifyContent: 'center',
   },
+  finderBlock: {
+    flex: 2,
+    flexDirection: 'row',
+  },
+  finderTitle: {
+    flex: 1,
+    marginLeft: '5%',
+  },
+  finderText: {
+    flex: 6,
+    height: 35,
+    borderWidth: 2,
+    marginHorizontal: '5%',
+    paddingLeft: 10,
+  }
 })
