@@ -20,9 +20,9 @@
       "supportsTablet": true
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+      "adaptiveIcon": { 
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#87CEFA" 
       },
       "package": "com.github.Zatvornik64.Dictionary"
     },
